@@ -128,3 +128,22 @@ birthweight_categ =
     mrace = factor(frace, levels = c("White", "Black", "Asian", "Puerto Rican", "Other"))
   )
 ```
+
+Out of the variables provided, a study from the Journal of Epidemiology & Community Health mentions maternal age and smoking status as risk factors for low birthweight, with social factors such as family income.  Additionally, a 2017 Nature article analyzing birthweight across different races noted differences with significant covariates such as gestational weight gain and length of gestation.
+
+```{r model}
+birthweight_model = 
+  lm(bwt ~ momage + smoken + fincome + mrace + wtgain + gaweeks, data = birthweight_categ)
+
+birthweight_pred = 
+  birthweight_categ %>%
+  add_predictions(birthweight_model) %>%
+  add_residuals(birthweight_model)
+
+birthweight_pred %>%
+  ggplot(aes(x = bwt, y = resid)) +
+  geom_point(alpha = 0.5) +
+  labs(title = "Birthweight Resdiual Plot",
+       x = "Birthweight (grams)",
+       y = "Residual")
+```
