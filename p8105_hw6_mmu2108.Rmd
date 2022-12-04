@@ -73,3 +73,25 @@ broom::tidy(glm_balt) %>%
   select(OR, low_CI, up_CI) %>% 
   knitr::kable(digits = 3)
 ```
+
+The odds of a homicide being solved for a male victim is 0.426 times the odds of a homicide being solved for a female victim.  We are 95% confident that the true odds ratio falls between 0.325 and 0.558.
+
+```{r all}
+glm_all = 
+  homicide %>%
+  group_by(city_state) %>%
+  nest() %>%
+  mutate(
+    logit_solve = map(data, ~glm(status ~ victim_age + victim_sex + victim_race, family = binomial, data=.x)),
+    logit_solve = map(logit_solve, broom::tidy)
+  ) %>%
+  select(-data) %>%
+  unnest() %>%
+  filter(term == "victim_sexMale") %>% 
+  mutate(
+    OR = exp(estimate), 
+    low_CI = exp(estimate - 1.96*std.error), 
+    up_CI = exp(estimate + 1.96*std.error), 
+    city_state = fct_reorder(city_state, estimate)) %>% 
+  select(city_state, OR, low_CI, up_CI)  
+```
