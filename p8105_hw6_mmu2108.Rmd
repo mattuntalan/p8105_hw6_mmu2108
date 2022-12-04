@@ -42,3 +42,17 @@ Due: December 3 at 11:59pm.
 | Problem 2       | 40        |
 | Problem 3       | 40        |
 
+
+### Problem 2
+
+```{r clean}
+homicide = 
+  read_csv("data/homicide-data.csv", na = c("", "Unknown")) %>%
+  mutate(
+    city_state = paste(city, state, sep = ","),
+    victim_age = as.numeric(victim_age),
+    status = ifelse(disposition == "Closed by arrest", 1, 0), 
+  ) %>%
+  subset(!(city_state %in% c("Dallas,TX","Phoenix,AZ","Kansas City,MO","Tulsa,AL"))) %>%
+  subset(victim_race == "White" | victim_race == "Black")
+```
