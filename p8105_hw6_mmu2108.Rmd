@@ -56,3 +56,20 @@ homicide =
   subset(!(city_state %in% c("Dallas,TX","Phoenix,AZ","Kansas City,MO","Tulsa,AL"))) %>%
   subset(victim_race == "White" | victim_race == "Black")
 ```
+
+```{r balt}
+glm_balt = 
+  homicide %>%
+  subset(city_state == "Baltimore,MD") %>%
+  glm(status ~ victim_age + victim_sex + victim_race, data = ., family = binomial)
+
+broom::tidy(glm_balt) %>% 
+  mutate(
+    OR = exp(estimate), 
+    low_CI = exp(estimate - 1.96*std.error), 
+    up_CI = exp(estimate + 1.96*std.error)
+  ) %>%
+  filter(term == "victim_sexMale") %>% 
+  select(OR, low_CI, up_CI) %>% 
+  knitr::kable(digits = 3)
+```
